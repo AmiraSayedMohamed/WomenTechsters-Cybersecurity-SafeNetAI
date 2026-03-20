@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+    import { useEffect } from 'react';
     import { AlertTriangle, CheckCircle, ShieldAlert, ArrowLeft, Loader2 } from 'lucide-react';
     import { Link } from 'react-router-dom';
     import { processSafetyRequest } from '../components/AIEngine';
+    import { setBackendWakeupCallback } from '../components/AIEngine';
     import type { SafetyResult } from '../components/AIEngine';
     import { motion, AnimatePresence } from 'framer-motion';
 
@@ -9,12 +11,21 @@ import React, { useState } from 'react';
       const [input, setInput] = useState('');
       const [loading, setLoading] = useState(false);
       const [result, setResult] = useState<SafetyResult | null>(null);
+  const [wakeupMessage, setWakeupMessage] = useState('');
+
+  useEffect(() => {
+    setBackendWakeupCallback((message: string) => {
+      setWakeupMessage(message);
+    });
+  }, []);
 
       const handleCheck = async () => {
         if (!input.trim()) return;
         setLoading(true);
+          setWakeupMessage('');
         const res = await processSafetyRequest('PHISHING', input);
         setResult(res as SafetyResult);
+          setWakeupMessage('');
         setLoading(false);
       };
 
@@ -122,6 +133,11 @@ import React, { useState } from 'react';
               {result && !result.success && (
                 <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700">
                   {result.error || 'Failed to analyze this message. Please try again.'}
+                            {wakeupMessage && (
+                              <div className="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 text-center font-medium animate-pulse">
+                                {wakeupMessage}
+                              </div>
+                            )}
                 </div>
               )}
             </AnimatePresence>

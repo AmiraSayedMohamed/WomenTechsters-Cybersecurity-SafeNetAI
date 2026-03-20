@@ -13,11 +13,61 @@ export interface SafetyResult {
 // Get API URL from environment or default to localhost
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
+const HEALTH_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') + '/health' || 'http://localhost:8000/health';
+let onBackendWakingUp: ((message: string) => void) | null = null;
+
+export function setBackendWakeupCallback(callback: (message: string) => void) {
+  onBackendWakingUp = callback;
+}
+
+async function ensureBackendAwake(): Promise<boolean> {
+  const MAX_RETRIES = 3;
+  const INITIAL_DELAY = 2000;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 1 && onBackendWakingUp) {
+        onBackendWakingUp(`جاري إيقاظ السيرفر... محاولة ${attempt} من ${MAX_RETRIES}`);
+      }
+
+      const response = await fetch(HEALTH_URL, {
+        method: 'GET',
+        signal: AbortSignal.timeout(10000),
+      });
+
+      if (response.ok) {
+        if (onBackendWakingUp) {
+          onBackendWakingUp('✓ السيرفر جاهز، جاري معالجة طلبك...');
+        }
+        return true;
+      }
+    } catch (error) {
+      if (attempt < MAX_RETRIES) {
+        const delay = INITIAL_DELAY * attempt;
+        if (onBackendWakingUp) {
+          onBackendWakingUp(`السيرفر يستيقظ، لو سمحت انتظر... (${Math.ceil(delay / 1000)} ثواني)`);
+        }
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  return false;
+}
+
 export async function processSafetyRequest(
   mode: string,
   text: string
 ): Promise<SafetyResult> {
   try {
+        // Ensure backend is awake before making request
+        const isAwake = await ensureBackendAwake();
+        if (!isAwake) {
+          return {
+            success: false,
+            error: 'Backend server is not responding. Please try again.',
+          };
+        }
     let endpoint = '';
     let payload: Record<string, string> = { text };
 

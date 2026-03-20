@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { Card, Container, Heading, Text, Button, Box, Tabs } from '@radix-ui/themes';
 import { processSafetyRequest } from '../components/AIEngine.ts';
+import { setBackendWakeupCallback } from '../components/AIEngine.ts';
 
 interface Quiz {
   id: number;
@@ -62,6 +64,13 @@ const LearningHub: React.FC = () => {
   const [lastTutorQuestion, setLastTutorQuestion] = useState('');
   const [tutorResponse, setTutorResponse] = useState('');
   const [loading, setLoading] = useState(false);
+  const [wakeupMessage, setWakeupMessage] = useState('');
+
+  useEffect(() => {
+    setBackendWakeupCallback((message: string) => {
+      setWakeupMessage(message);
+    });
+  }, []);
 
   const handleQuizStart = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
@@ -93,6 +102,7 @@ const LearningHub: React.FC = () => {
     if (!question) return;
     
     setLoading(true);
+      setWakeupMessage('');
     setLastTutorQuestion(question);
     try {
       const response = await processSafetyRequest('TUTOR', question);
@@ -106,6 +116,7 @@ const LearningHub: React.FC = () => {
       setTutorResponse(`Error: Unable to get response from AI tutor`);
     } finally {
       setLoading(false);
+      setWakeupMessage('');
     }
   };
 
@@ -212,6 +223,12 @@ const LearningHub: React.FC = () => {
                     </Text>
                   )}
                   <Text className="whitespace-pre-wrap">{tutorResponse}</Text>
+            
+                            {wakeupMessage && (
+                              <Card className="p-4 bg-blue-50 border border-blue-200 text-center animate-pulse">
+                                <Text className="text-blue-700 font-medium">{wakeupMessage}</Text>
+                              </Card>
+                            )}
                 </Card>
               )}
             </div>
