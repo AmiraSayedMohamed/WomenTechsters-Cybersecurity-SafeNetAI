@@ -1,0 +1,19 @@
+# Ignore backend files for Vercel frontend deployment
+app/
+requirements.txt
+Dockerfile
+BACKEND_DEPLOYMENT.md
+DEPLOYMENT_CHECKLIST.md
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_READY.md
+DEPLOYMENT_SUMMARY.md
+QUICK_REFERENCE.md
+
+# Local and virtual env files
+.venv/
+.env
+.env.*
+
+# Python cache
+__pycache__/
+*.pyc
