@@ -1,6 +1,12 @@
 # SafeNet AI
-
+website link : https://women-techsters-cybersecurity-safe.vercel.app/
 SafeNet AI is a cybersecurity assistant built for everyday users, especially in African digital contexts where phishing, mobile money fraud, and low-tech security barriers are common.
+
+i have deployed fronted on vercel here its the link of the website you can use it now :
+https://women-techsters-cybersecurity-safe.vercel.app/
+and i have deployed the backed on hugging face here its the repositery link:
+https://huggingface.co/spaces/amira-sayed/SafeNet-Ai/tree/main
+
 
 It combines a modern React frontend with a FastAPI backend and AI-powered analysis to help users:
 - Check suspicious messages for phishing risks
