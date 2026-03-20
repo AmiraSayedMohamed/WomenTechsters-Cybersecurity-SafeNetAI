@@ -1,3 +1,13 @@
+---
+title: SafeNet AI
+emoji: "🛡️"
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # SafeNet AI
 website link : https://women-techsters-cybersecurity-safe.vercel.app/
 SafeNet AI is a cybersecurity assistant built for everyday users, especially in African digital contexts where phishing, mobile money fraud, and low-tech security barriers are common.
